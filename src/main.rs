@@ -16,9 +16,12 @@ impl<'r> FromRequest<'r> for ClientAddr {
     type Error = ClientAddrError;
 
     async fn from_request(req: &'r Request<'_>) -> Outcome<Self, Self::Error> {
-        match req.client_ip()  {
-            None => Outcome::Failure((Status::InternalServerError, ClientAddrError::Invalid)),
-            Some(addr) => Outcome::Success(ClientAddr{ip: addr}),
+        match req.real_ip() {
+            Some(addr_str) => Outcome::Success(ClientAddr{ip: addr_str }),
+            None => match req.client_ip()  {
+                None => Outcome::Failure((Status::InternalServerError, ClientAddrError::Invalid)),
+                Some(addr) => Outcome::Success(ClientAddr{ip: addr}),
+            }
         }
     }
 }
