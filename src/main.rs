@@ -1,6 +1,7 @@
 #[macro_use] extern crate rocket;
 
 use std::net::IpAddr;
+use std::path::PathBuf;
 use rocket::http::Status;
 use rocket::request::{Request, Outcome, FromRequest};
 
@@ -26,8 +27,8 @@ impl<'r> FromRequest<'r> for ClientAddr {
     }
 }
 
-#[get("/")]
-fn index(addr: ClientAddr) -> String {
+#[get("/<_path..>")]
+fn index(_path: PathBuf, addr: ClientAddr) -> String {
     let addr_str = addr.ip.to_string();
     return addr_str
 }
